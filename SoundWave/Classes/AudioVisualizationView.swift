@@ -89,6 +89,8 @@ public class AudioVisualizationView: BaseNibView {
 			self.setNeedsDisplay()
 		}
 	}
+    
+    public var onFinishedPlaying: (() -> Void)?
 
 	override public init(frame: CGRect) {
 		super.init(frame: frame)
@@ -201,6 +203,7 @@ public class AudioVisualizationView: BaseNibView {
 
 			if timerDuration >= duration {
 				this.stop()
+                this.onFinishedPlaying?()
 				return
 			}
 
@@ -220,9 +223,8 @@ public class AudioVisualizationView: BaseNibView {
 		self.playChronometer?.stop()
 		self.playChronometer = nil
 
-		self.currentGradientPercentage = 1.0
+        self.currentGradientPercentage = meteringLevels?.isEmpty == false ? 0.0 : nil
 		self.setNeedsDisplay()
-		self.currentGradientPercentage = nil
 	}
 
 	// MARK: - Mask + Gradient
@@ -267,7 +269,7 @@ public class AudioVisualizationView: BaseNibView {
 
 		let colorSpace = CGColorSpaceCreateDeviceRGB()
 		let colorLocations: [CGFloat] = [0.0, 1.0]
-		let colors = [self.gradientStartColor.cgColor, self.gradientEndColor.cgColor]
+		let colors = [self.gradientEndColor.cgColor, self.gradientEndColor.cgColor]
 
 		let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: colorLocations)
 
