@@ -44,6 +44,7 @@ public class AudioVisualizationView: BaseNibView {
 	public var audioVisualizationMode: AudioVisualizationMode = .read
 
 	public var audioVisualizationTimeInterval: TimeInterval = 0.05 // Time interval between each metering bar representation
+    public var audioVisualizationTimerCurrentValue: TimeInterval? // Start position
 
 	// Specify a `gradientPercentage` to have the width of gradient be that percentage of the view width (starting from left)
 	// The rest of the screen will be filled by `self.gradientStartColor` to display nicely.
@@ -89,8 +90,6 @@ public class AudioVisualizationView: BaseNibView {
 			self.setNeedsDisplay()
 		}
 	}
-    
-    public var onFinishedPlaying: (() -> Void)?
 
 	override public init(frame: CGRect) {
 		super.init(frame: frame)
@@ -193,8 +192,9 @@ public class AudioVisualizationView: BaseNibView {
 			return
 		}
 
-		self.playChronometer = Chronometer(withTimeInterval: self.audioVisualizationTimeInterval)
+        self.playChronometer = Chronometer(withTimeInterval: self.audioVisualizationTimeInterval, timerCurrentValue: self.audioVisualizationTimerCurrentValue)
 		self.playChronometer?.start(shouldFire: false)
+        self.audioVisualizationTimerCurrentValue = nil
 
 		self.playChronometer?.timerDidUpdate = { [weak self] timerDuration in
 			guard let this = self else {
@@ -203,7 +203,6 @@ public class AudioVisualizationView: BaseNibView {
 
 			if timerDuration >= duration {
 				this.stop()
-                this.onFinishedPlaying?()
 				return
 			}
 
