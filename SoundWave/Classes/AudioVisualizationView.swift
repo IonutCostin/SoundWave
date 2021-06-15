@@ -126,7 +126,7 @@ public class AudioVisualizationView: BaseNibView {
 	}
 
     public func scaleSoundDataToFitScreen() -> [Float] {
-        let meteringLevels = meteringLevelsArray.isEmpty ? (meteringLevels ?? []) : meteringLevelsArray
+        let meteringLevels = meteringLevelsArray.isEmpty ? (self.meteringLevels ?? []) : meteringLevelsArray
         guard !meteringLevels.isEmpty else { return [] }
 
         self.meteringLevelsClusteredArray.removeAll()
