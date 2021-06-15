@@ -125,41 +125,40 @@ public class AudioVisualizationView: BaseNibView {
 		self.setNeedsDisplay()
 	}
 
-	public func scaleSoundDataToFitScreen() -> [Float] {
-		if self.meteringLevelsArray.isEmpty {
-			return []
-		}
+    public func scaleSoundDataToFitScreen() -> [Float] {
+        let meteringLevels = meteringLevelsArray.isEmpty ? (meteringLevels ?? []) : meteringLevelsArray
+        guard !meteringLevels.isEmpty else { return [] }
 
-		self.meteringLevelsClusteredArray.removeAll()
-		var lastPosition: Int = 0
+        self.meteringLevelsClusteredArray.removeAll()
+        var lastPosition: Int = 0
 
-		for index in 0..<self.maximumNumberBars {
-			let position: Float = Float(index) / Float(self.maximumNumberBars) * Float(self.meteringLevelsArray.count)
-			var h: Float = 0.0
+        for index in 0..<self.maximumNumberBars {
+            let position: Float = Float(index) / Float(self.maximumNumberBars) * Float(meteringLevels.count)
+            var h: Float = 0.0
 
-			if self.maximumNumberBars > self.meteringLevelsArray.count && floor(position) != position {
-				let low: Int = Int(floor(position))
-				let high: Int = Int(ceil(position))
+            if self.maximumNumberBars > meteringLevels.count && floor(position) != position {
+                let low: Int = Int(floor(position))
+                let high: Int = Int(ceil(position))
 
-				if high < self.meteringLevelsArray.count {
-					h = self.meteringLevelsArray[low] + ((position - Float(low)) * (self.meteringLevelsArray[high] - self.meteringLevelsArray[low]))
-				} else {
-					h = self.meteringLevelsArray[low]
-				}
-			} else {
-				for nestedIndex in lastPosition...Int(position) {
-					h += self.meteringLevelsArray[nestedIndex]
-				}
-				let stepsNumber = Int(1 + position - Float(lastPosition))
-				h = h / Float(stepsNumber)
-			}
+                if high < meteringLevels.count {
+                    h = meteringLevels[low] + ((position - Float(low)) * (meteringLevels[high] - meteringLevels[low]))
+                } else {
+                    h = meteringLevels[low]
+                }
+            } else {
+                for nestedIndex in lastPosition...Int(position) {
+                    h += meteringLevels[nestedIndex]
+                }
+                let stepsNumber = Int(1 + position - Float(lastPosition))
+                h = h / Float(stepsNumber)
+            }
 
-			lastPosition = Int(position)
-			self.meteringLevelsClusteredArray.append(h)
-		}
-		self.setNeedsDisplay()
-		return self.meteringLevelsClusteredArray
-	}
+            lastPosition = Int(position)
+            self.meteringLevelsClusteredArray.append(h)
+        }
+        self.setNeedsDisplay()
+        return self.meteringLevelsClusteredArray
+    }
 
 	// PRAGMA: - Play Mode Handling
 
